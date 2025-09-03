@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -24,9 +24,20 @@ jobs:
       - name: Install Expo & EAS CLI
         run: npm install -g expo-cli eas-cli
 
-      - name: Build APK
+      - name: Verify Expo and EAS
         run: |
-          npx expo install
-          npx eas build --platform android --profile preview --non-interactive
+          npx expo --version
+          npx eas --version
+
+      - name: Build APK with EAS
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx expo prebuild --non-interactive
+          npx eas build --platform android --profile preview --non-interactive --local --output=app.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dhis2-expo-app
+          path: app.apk
