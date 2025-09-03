@@ -1,43 +1,6 @@
-name: Build Android APK
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install Expo & EAS CLI
-        run: npm install -g expo-cli eas-cli
-
-      - name: Verify Expo and EAS
-        run: |
-          npx expo --version
-          npx eas --version
-
-      - name: Build APK with EAS
+- name: Build APK with EAS (Cloud)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           npx expo prebuild --non-interactive
-          npx eas build --platform android --profile preview --non-interactive --local --output=app.apk
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dhis2-expo-app
-          path: app.apk
+          npx eas build --platform android --profile preview --non-interactive
